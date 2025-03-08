@@ -1,0 +1,10 @@
+federation_version: 2
+subgraphs:
+  current-service:
+    routing_url: ${env.CURRENT_SERVICE_URL:-http://localhost:4001/graphql}
+    schema:
+      file: ./graph/current-service.graphqls
+#  new-service:
+#    routing_url: http://localhost:4002/graphql
+#    schema:
+#      file: graph/new-service.graphqls

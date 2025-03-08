@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=./router-config.schema.json
+supergraph:
+  listen: "0.0.0.0:${env.PORT}"
+  path: "${env.ENDPOINT_PATH}"
+  introspection: true
+
+sandbox:
+  enabled: true
+
+homepage:
+  enabled: false
+
+include_subgraph_errors:
+  all: true
+
+plugins:
+  # Enable with the header, Apollo-Expose-Query-Plan: true
+  experimental.expose_query_plan: true
+
+cors:
+  allow_any_origin: true
+
+csrf:
+  unsafe_disabled: true
+#  required_headers:
+#    - X-Apollo-Operation-Name
+#    - Apollo-Require-Preflight
+
+health_check:
+  listen: 0.0.0.0:8088
+  enabled: true
+  path: /health
+
+telemetry:
+  apollo:
+    field_level_instrumentation_sampler: always_on
+  exporters:
+    logging:
+      common:
+        service_name: apollo-router
+        service_namespace: router
+      stdout:
+        enabled: true
+        format:
+          json:
+            display_filename: true
+            display_level: true
+            display_line_number: true
+            display_target: true
+            display_thread_id: true
+            display_thread_name: true
+            display_timestamp: true
+            display_current_span: true
+            display_span_list: true
+            display_resource: true
+            display_trace_id: true
+            display_span_id: true
+    metrics:
+      common:
+        service_name: apollo-router
+        service_namespace: router
+      otlp:
+        enabled: true
+        endpoint: "${env.METRICS_OTLP_ENDPOINT}"
+        protocol: "${env.METRICS_OTLP_PROTOCOL}"
+        grpc:
+          metadata:
+            foo: bar
+    tracing:
+      common:
+        service_name: apollo-router
+        service_namespace: router
+        sampler: always_on
+        parent_based_sampler: true
+      otlp:
+        enabled: true
+        endpoint: "${env.TRACING_OTLP_ENDPOINT}"
+        protocol: "${env.TRACING_OTLP_PROTOCOL}"
+        grpc:
+          metadata:
+            "test-header": "test-value"

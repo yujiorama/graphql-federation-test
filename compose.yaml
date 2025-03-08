@@ -1,0 +1,20 @@
+services:
+  current-service:
+    build:
+      context: app/current-service
+    ports:
+      - "14001:4001"
+    environment:
+      - PORT=4001
+      - ENDPOINT_PATH=/graphql
+      - SCHEMA_PATH=/app/graph/schema.graphqls
+
+  new-service:
+    build:
+      context: app/new-service
+    ports:
+      - "14002:4002"
+    environment:
+      - PORT=4002
+      - ENDPOINT_PATH=/graphql
+      - SCHEMA_PATH=/app/graph/schema.graphqls

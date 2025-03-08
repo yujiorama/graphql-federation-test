@@ -1,0 +1,53 @@
+services:
+  router:
+    build:
+      context: ./router/apollo-router
+      dockerfile: Dockerfile
+      target: router
+      args:
+        - CURRENT_SERVICE_URL=http://current-service:4001/graphql
+    container_name: router
+    ports:
+      - "14000:4000"
+    depends_on:
+      - current-service
+      - otelcollector
+    working_dir: /router
+    environment:
+      - PORT=4000
+      - ENDPOINT_PATH=/graphql
+      - APOLLO_ELV2_LICENSE=accept
+      - APOLLO_ROUTER_LOG=debug
+      - APOLLO_TELEMETRY_DISABLED=true
+      - APOLLO_ROUTER_CONFIG_PATH=/router/config/router-config.yaml
+      - APOLLO_ROUTER_SUPERGRAPH_PATH=/router/config/graph/supergraph.graphqls
+      - METRICS_OTLP_ENDPOINT=http://otelcollector:4317
+      - METRICS_OTLP_PROTOCOL=grpc
+      - TRACING_OTLP_ENDPOINT=http://otelcollector:4317
+      - TRACING_OTLP_PROTOCOL=grpc
+      - CURRENT_SERVICE_URL=http://current-service:4001/graphql
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  otelcollector:
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.120.0
+    volumes:
+      - ./router/apollo-router/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP http receiver
+    environment:
+      - AWS_REGION=ap-northeast-1
+
+  rover:
+    build:
+      context: ./router/apollo-router
+      dockerfile: Dockerfile
+      target: rover
+    container_name: rover
+    environment:
+      - APOLLO_ELV2_LICENSE=accept
+      - APOLLO_TELEMETRY_DISABLED=true
+    working_dir: /router
+    volumes:
+      - ./router/apollo-router/config:/router/config
