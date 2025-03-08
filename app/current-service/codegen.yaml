@@ -1,0 +1,12 @@
+schema: './graph/schema.graphqls'
+generates:
+  ./src/generated/resolvers-types.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-resolvers'
+    config:
+      contextType: '../index#MyContext'
+      useIndexSignature: true
+      avoidOptionals: true
+      skipTypename: false
+      immutableTypes: true

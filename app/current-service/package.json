@@ -1,0 +1,27 @@
+{
+  "name": "current-service",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "node dist/index.js",
+    "start:dev": "pnpm build && pnpm start",
+    "codegen": "graphql-codegen --config codegen.yaml"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@apollo/server": "^4.11.3",
+    "graphql": "^16.10.0",
+    "graphql-tag": "^2.12.6"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "5.0.5",
+    "@graphql-codegen/typescript": "4.1.5",
+    "@graphql-codegen/typescript-resolvers": "4.4.4",
+    "@types/node": "^22.13.9",
+    "typescript": "^5.8.2"
+  }
+}

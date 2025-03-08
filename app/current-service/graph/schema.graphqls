@@ -1,0 +1,57 @@
+# noinspection GraphQLTypeRedefinition
+type Item {
+    id: ID!
+    name: String!
+    price: Int
+    tags: [Tag!]!
+}
+
+type Tag {
+    id: ID!
+    name: String!
+    value: String!
+    item: Item
+}
+
+type Query {
+    getItem(id: ID!): Item
+    getTag(id: ID!): Tag
+    findItemsByTag(name: String, value: String): [Item!]!
+}
+
+type Mutation {
+    addItem(input: AddItemInput!): AddItemPayload!
+    addTagToItem(input: AddTagToItemInput!): AddTagToItemPayload!
+    createTag(input: CreateTagInput!): CreateTagPayload!
+}
+
+input AddItemInput {
+    name: String!
+    price: Int
+}
+
+type AddItemPayload {
+    ok: Boolean!
+    item: Item
+}
+
+input AddTagToItemInput {
+    itemId: ID!
+    tagId: ID!
+}
+
+type AddTagToItemPayload {
+    ok: Boolean!
+    item: Item
+}
+
+input CreateTagInput {
+    name: String!
+    value: String!
+}
+
+type CreateTagPayload {
+    ok: Boolean!
+    tag: Tag
+}
+
