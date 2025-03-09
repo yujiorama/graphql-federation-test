@@ -1,0 +1,47 @@
+services:
+  router:
+    build:
+      context: ./router/wundergraph-cosmo
+      dockerfile: Dockerfile
+      target: router
+      args:
+        - CURRENT_SERVICE_URL=http://current-service:4001/graphql
+        - EXECUTION_CONFIG_FILE=/router/config/execution-config.json
+    container_name: router
+    ports:
+      - "14000:4000"
+    depends_on:
+      - current-service
+      - otelcollector
+    working_dir: /router
+    environment:
+      - LOG_LEVEL=debug
+      - LISTEN_ADDR=0.0.0.0:4000
+      - GRAPHQL_PATH=/graphql
+      - METRICS_OTLP_ENDPOINT=http://otelcollector:4317
+      - TRACING_OTLP_ENDPOINT=http://otelcollector:4317
+      - CONTROLPLANE_URL=http://localhost:3001
+      - EXECUTION_CONFIG_FILE=/router/config/execution-config.json
+      - CURRENT_SERVICE_URL=http://current-service:4001/graphql
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  otelcollector:
+    image: ghcr.io/wundergraph/cosmo/otelcollector:0.18.1
+    volumes:
+      - ./router/wundergraph-cosmo/otel-collector-config.yaml:/etc/otel-config.yaml
+    ports:
+      - '4317:4317'
+      - '4318:4318'
+    environment:
+      - AWS_REGION=ap-northeast-1
+
+  wgc:
+    build:
+      context: ./router/wundergraph-cosmo
+      dockerfile: Dockerfile
+      target: wgc
+    container_name: wgc
+    working_dir: /router
+    volumes:
+      - ./router/wundergraph-cosmo/config:/router/config

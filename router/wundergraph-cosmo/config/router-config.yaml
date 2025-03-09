@@ -1,0 +1,152 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/wundergraph/cosmo/main/router/pkg/config/config.schema.json
+version: "1"
+
+# Cluster
+cluster:
+  name: "graphql-federation-test-router"
+
+# TLS
+tls:
+  server:
+    enabled: false
+
+# Compliance
+compliance:
+  anonymize_ip:
+    enabled: true
+    method: redact
+
+# CORS
+cors:
+  allow_origins:
+    - "*"
+  allow_methods:
+    - HEAD
+    - GET
+    - POST
+  allow_headers:
+    - "*"
+  allow_credentials: true
+  max_age: 5m
+
+# Router
+log_level: info
+graphql_path: "${GRAPHQL_PATH}"
+listen_addr: "${LISTEN_ADDR}"
+controlplane_url: "${CONTROLPLANE_URL}"
+introspection_enabled: true
+json_log: true
+shutdown_delay: 30s
+grace_period: 5s
+poll_interval: 30s
+health_check_path: "/health"
+readiness_check_path: "/health/ready"
+liveness_check_path: "/health/live"
+
+# Cache Control Policy
+cache_control_policy:
+  enabled: false
+#  value: "max-age=30, public"
+#  subgraphs:
+#    - name: "current-service"
+#      value: "max-age=30, public"
+#    - name: "new-service"
+#      value: "no-cache, no-store, must-revalidate"
+
+# Access Logs
+access_logs:
+  enabled: true
+  router:
+    fields:
+      - key: "service"
+        value_from:
+          request_header: "x-service"
+      - key: "operationName"
+        value_from:
+          context_field: operation_name
+  subgraphs:
+    fields:
+      - key: "service"
+        value_from:
+          request_header: "x-service"
+      - key: "response-service"
+        value_from:
+          response_header: "x-response-service"
+      - key: "operationName"
+        value_from:
+          context_field: operation_name
+
+# Telemetry
+telemetry:
+  service_name: "router"
+  resource_attributes:
+    - key: "service_namespace"
+      value: "cosmo-router"
+  attributes: []
+
+  metrics:
+    otlp:
+      enabled: true
+      router_runtime: true
+      graphql_cache: true
+      exclude_metrics: []
+      exclude_metric_labels: []
+      exporters:
+        - exporter: grpc
+          disabled: false
+          endpoint: "${METRICS_OTLP_ENDPOINT}"
+          temporality: delta
+    attributes:
+      - key: "error_codes"
+        value_from:
+          context_field: graphql_error_codes
+
+  tracing:
+    enabled: true
+    sampling_rate: 1
+    with_new_root: false
+    export_graphql_variables: false
+    exporters:
+      - exporter: grpc
+        disabled: false
+        endpoint: "${TRACING_OTLP_ENDPOINT}"
+        batch_timeout: 10s
+        export_timeout: 30s
+    propagation:
+      trace_context: true
+      baggage: false
+      jaeger: false
+      b3: false
+      datadog: false
+
+# GraphQL Metrics
+graphql_metrics:
+  enabled: false
+
+## Storage Providers
+# storage_providers:
+#  redis:
+#    - id: "pq-storage-provider"
+#      cluster_enabled: false
+#      urls:
+#        - "${PQ_STORAGE_PROVIDER_URL}"
+#
+## Persisted Operations
+# persisted_operations:
+#  log_unknown: true
+#  safelist:
+#    enabled: false
+#  cache:
+#    size: 100MB
+#  storage:
+#    provider_id: "pq-storage-provider"
+#    object_prefix: "pq"
+
+# Automatic Persisted Queries
+automatic_persisted_queries:
+  enabled: false
+
+# Execution Config
+execution_config:
+  file:
+    path: "${EXECUTION_CONFIG_FILE}"
