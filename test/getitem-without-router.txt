@@ -1,0 +1,3 @@
+POST http://localhost:14001/graphql
+Content-Type: application/json
+@./test/GetItem.json

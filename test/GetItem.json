@@ -1,0 +1,1 @@
+{"operationName":"GetItem","query":"query GetItem { getItem(id:\"1\") { id name }}"}
