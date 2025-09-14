@@ -16,6 +16,8 @@
   "description": "",
   "dependencies": {
     "@apollo/server": "5.0.0",
+    "better-sqlite3": "^9.4.3",
+    "drizzle-orm": "^0.33.0",
     "graphql": "^16.11.0",
     "graphql-tag": "^2.12.6"
   },
@@ -23,7 +25,9 @@
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/typescript": "4.1.5",
     "@graphql-codegen/typescript-resolvers": "4.4.4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.18.3",
+    "drizzle-kit": "^0.26.2",
     "typescript": "^5.9.2"
   }
 }
