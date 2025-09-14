@@ -7,6 +7,9 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "types": ["node"],
-    "allowSyntheticDefaultImports": true
-  }
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["drizzle.config.ts", "node_modules"]
 }
