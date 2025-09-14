@@ -1,21 +1,21 @@
-import {readFileSync} from "fs";
-import {resolve} from "path";
 import {ApolloServer} from "@apollo/server";
 import {startStandaloneServer} from "@apollo/server/standalone";
 import {ApolloServerPluginInlineTraceDisabled} from '@apollo/server/plugin/disabled';
 import gql from "graphql-tag";
-import resolvers from "./resolvers/index.js";
-import {ItemDatasource, TagDatasource} from "./datasource.js";
+import {newMyResolvers} from "./resolver/index.js";
+import {MyDataSource, newMyDataSource} from "./datasource/index.js";
+import {fileURLToPath} from "node:url";
+import * as path from "path";
+import * as fs from "fs";
 
 // スキーマをファイルから読み込む
-const schemaPath = resolve(process.env.SCHEMA_PATH || "../graph/schema.graphqls");
-const typeDefs = readFileSync(schemaPath, "utf-8");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const schemaPath = process.env.SCHEMA_PATH ?? path.resolve(__dirname, "../graph/schema.graphqls");
+const typeDefs = fs.readFileSync(schemaPath, "utf-8");
 
 export interface MyContext {
-    dataSources: {
-        itemDataSource: ItemDatasource;
-        tagDataSource: TagDatasource;
-    }
+    dataSource: MyDataSource;
 }
 
 // アクセスログを出力するためのプラグイン
@@ -41,7 +41,7 @@ const logAccessPlugin = {
 
 const server = new ApolloServer<MyContext>({
     typeDefs: gql(typeDefs),
-    resolvers: resolvers,
+    resolvers: newMyResolvers(),
     plugins: [ApolloServerPluginInlineTraceDisabled(), logAccessPlugin],
 });
 
@@ -51,10 +51,7 @@ const endpointPort = process.env.PORT || "4001";
 const serverOptions = {
     context: async ({req}) => {
         return {
-            dataSources: {
-                itemDataSource: new ItemDatasource(),
-                tagDataSource: new TagDatasource(),
-            }
+            dataSource: newMyDataSource(),
         };
     },
     listen: {
