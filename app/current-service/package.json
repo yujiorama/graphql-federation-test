@@ -4,11 +4,11 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p .",
-    "start": "node dist/index.js",
-    "dev": "pnpm build && pnpm start",
-    "generate": "graphql-codegen",
-    "prestart": "pnpm generate",
-    "predev": "pnpm generate"
+    "start": "dotenvx run --env-file=.env node dist/index.js",
+    "prestart": "pnpm codegen:generate && pnpm build",
+    "dev": "dotenvx run --env-file=.env.dev --env-file=.env node dist/index.js",
+    "predev": "pnpm codegen:generate && pnpm build",
+    "codegen:generate": "graphql-codegen"
   },
   "keywords": [],
   "author": "",
@@ -16,8 +16,9 @@
   "description": "",
   "dependencies": {
     "@apollo/server": "5.0.0",
+    "@dotenvx/dotenvx": "^1.49.0",
     "better-sqlite3": "^9.4.3",
-    "drizzle-orm": "^0.33.0",
+    "drizzle-orm": "^0.44.5",
     "graphql": "^16.11.0",
     "graphql-tag": "^2.12.6"
   },
@@ -27,7 +28,7 @@
     "@graphql-codegen/typescript-resolvers": "4.4.4",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.18.3",
-    "drizzle-kit": "^0.26.2",
+    "drizzle-kit": "^0.31.4",
     "typescript": "^5.9.2"
   }
 }
