@@ -1,13 +1,11 @@
 CREATE TABLE `ad_image` (
 	`id` text PRIMARY KEY NOT NULL,
-	`item_id` text NOT NULL,
 	`url` text NOT NULL,
 	`text` text
 );
 --> statement-breakpoint
 CREATE TABLE `ad_link` (
 	`id` text PRIMARY KEY NOT NULL,
-	`item_id` text NOT NULL,
 	`url` text NOT NULL,
 	`text` text NOT NULL
 );

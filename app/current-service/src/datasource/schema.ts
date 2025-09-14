@@ -55,7 +55,6 @@ export const itemTags = sqliteTable(
  */
 export const adLink = sqliteTable("ad_link", {
     id: text("id").primaryKey(),
-    itemId: text("item_id").notNull(),
     url: text("url").notNull(),
     text: text("text").notNull(),
 });
@@ -89,7 +88,6 @@ export const itemAdLinks = sqliteTable(
  */
 export const adImage = sqliteTable("ad_image", {
     id: text("id").primaryKey(),
-    itemId: text("item_id").notNull(),
     url: text("url").notNull(),
     text: text("text"),
 });
