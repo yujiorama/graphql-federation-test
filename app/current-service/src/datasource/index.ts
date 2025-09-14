@@ -1,6 +1,6 @@
 import { Item, Tag } from "../generated/resolvers-types";
 import { randomUUID } from "node:crypto";
-import { DbSqlite } from "./db";
+import type {Database, DatabaseConnection} from './db';
 
 export interface ItemDataSource {
     findItemsByTag: (name: string, value: string) => Promise<Item[]>;
@@ -23,8 +23,8 @@ function rowToTag(row: any): Tag {
     };
 }
 
-function buildItem(sqlite: DbSqlite, row: any): Item {
-    const tags = sqlite
+function buildItem(db: DatabaseConnection, row: any): Item {
+    const tags = db
         .prepare(
             `SELECT t.id, t.name, t.value
              FROM tags t
@@ -45,10 +45,10 @@ function buildItem(sqlite: DbSqlite, row: any): Item {
     } as Item;
 }
 
-function createItemDataSource(sqlite: DbSqlite): ItemDataSource {
+function createItemDataSource(db: DatabaseConnection): ItemDataSource {
     return {
         async findItemsByTag(name: string, value: string): Promise<Item[]> {
-            const rows = sqlite
+            const rows = db
                 .prepare(
                     `SELECT DISTINCT i.id, i.name, i.value, i.price
                      FROM items i
@@ -58,31 +58,31 @@ function createItemDataSource(sqlite: DbSqlite): ItemDataSource {
                 )
                 .all(name, value);
 
-            return rows.map((r: any) => buildItem(sqlite, r));
+            return rows.map((r: any) => buildItem(db, r));
         },
 
         getItem(itemId: string): Item | undefined {
-            const row = sqlite
+            const row = db
                 .prepare(`SELECT id, name, value, price FROM items WHERE id = ?`)
                 .get(itemId);
             if (!row) return undefined;
-            return buildItem(sqlite, row);
+            return buildItem(db, row);
         },
 
         getItems(): Item[] {
-            const rows = sqlite
+            const rows = db
                 .prepare(`SELECT id, name, value, price FROM items ORDER BY id`)
                 .all();
-            return rows.map((r: any) => buildItem(sqlite, r));
+            return rows.map((r: any) => buildItem(db, r));
         },
     };
 }
 
-function createTagDataSource(sqlite: DbSqlite): TagDataSource {
+function createTagDataSource(db: DatabaseConnection): TagDataSource {
     return {
         createTag(name: string, value: string): Tag {
             const id = randomUUID();
-            sqlite
+            db
                 .prepare(`INSERT INTO tags (id, name, value) VALUES (?, ?, ?)`)
                 .run(id, name, value);
             return {
@@ -94,7 +94,7 @@ function createTagDataSource(sqlite: DbSqlite): TagDataSource {
         },
 
         getTag(tagId: string): Tag | undefined {
-            const row = sqlite
+            const row = db
                 .prepare(`SELECT id, name, value FROM tags WHERE id = ?`)
                 .get(tagId);
             if (!row) return undefined;
@@ -102,7 +102,7 @@ function createTagDataSource(sqlite: DbSqlite): TagDataSource {
         },
 
         getTags(): Tag[] {
-            const rows = sqlite
+            const rows = db
                 .prepare(`SELECT id, name, value FROM tags ORDER BY id`)
                 .all();
             return rows.map(rowToTag);
@@ -115,9 +115,9 @@ export type MyDataSource = {
     readonly tag: TagDataSource;
 };
 
-export function newMyDataSource(sqlite: DbSqlite): MyDataSource {
+export function newMyDataSource(db: Database): MyDataSource {
     return {
-        item: createItemDataSource(sqlite),
-        tag: createTagDataSource(sqlite),
+        item: createItemDataSource(db.db.$client),
+        tag: createTagDataSource(db.db.$client),
     };
 }

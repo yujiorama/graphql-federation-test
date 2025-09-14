@@ -1,3 +1,4 @@
+import '@dotenvx/dotenvx/config';
 import {ApolloServer} from "@apollo/server";
 import {startStandaloneServer} from "@apollo/server/standalone";
 import {ApolloServerPluginInlineTraceDisabled} from '@apollo/server/plugin/disabled';
@@ -16,7 +17,7 @@ const schemaPath = process.env.SCHEMA_PATH ?? path.resolve(__dirname, "../graph/
 const typeDefs = fs.readFileSync(schemaPath, "utf-8");
 
 // DB 初期化（マイグレーション & シード適用）
-const { sqlite } = await initDb();
+const database = await initDb();
 
 export interface MyContext {
     dataSource: MyDataSource;
@@ -55,7 +56,7 @@ const endpointPort = process.env.PORT || "4001";
 const serverOptions = {
     context: async () => {
         return {
-            dataSource: newMyDataSource(sqlite),
+            dataSource: newMyDataSource(database),
         };
     },
     listen: {

@@ -1,28 +1,25 @@
-import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import Database from "better-sqlite3";
 
-export type DbSqlite = import("better-sqlite3").Database;
+export type DatabaseConnection = Database.Database;
 
-type DbSingleton = {
-  sqlite: DbSqlite;
+export type Database = {
   db: ReturnType<typeof drizzle>;
 };
 
-let singleton: DbSingleton | null = null;
+let singleton: Database | null = null;
 
 /**
  * SQLite の接続とマイグレーションを初期化します。
- * SQLITE_PATH が未設定ならインメモリ (\":memory:\") で起動します。
+ * DATABASE_URL が未設定ならインメモリ (\":memory:\") で起動します。
  */
-export async function initDb(): Promise<DbSingleton> {
+export async function initDb(): Promise<Database> {
   if (singleton) return singleton;
 
-  const dbFile = process.env.SQLITE_PATH || ":memory:";
-  const sqlite = new Database(dbFile);
-  const db = drizzle(sqlite);
+  const db = drizzle(process.env.DATABASE_URL);
 
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
@@ -31,6 +28,6 @@ export async function initDb(): Promise<DbSingleton> {
   // プログラムからマイグレーションを適用（初回のみ）
   migrate(db, { migrationsFolder });
 
-  singleton = { sqlite, db };
+  singleton = { db };
   return singleton;
 }
