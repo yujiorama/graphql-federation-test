@@ -1,3 +1,6 @@
 ignoredBuiltDependencies:
-  - better-sqlite3
   - esbuild
+
+onlyBuiltDependencies:
+  - '@apollo/protobufjs'
+  - better-sqlite3
