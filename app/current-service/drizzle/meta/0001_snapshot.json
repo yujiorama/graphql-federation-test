@@ -1,0 +1,376 @@
+{
+  "id": "1019b59f-8429-46d1-bf50-df22b4737a01",
+  "prevId": "5d3db55d-1f79-4ca1-95c1-caf1fc3b76dd",
+  "version": "6",
+  "dialect": "sqlite",
+  "tables": {
+    "ad_image": {
+      "name": "ad_image",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "ad_link": {
+      "name": "ad_link",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "item": {
+      "name": "item",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "price": {
+          "name": "price",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "item_ad_images": {
+      "name": "item_ad_images",
+      "columns": {
+        "item_id": {
+          "name": "item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ad_image_id": {
+          "name": "ad_image_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "item_ad_images_item_id_ad_image_id_unique": {
+          "name": "item_ad_images_item_id_ad_image_id_unique",
+          "columns": [
+            "item_id",
+            "ad_image_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "item_ad_images_item_id_item_id_fk": {
+          "name": "item_ad_images_item_id_item_id_fk",
+          "tableFrom": "item_ad_images",
+          "columnsFrom": [
+            "item_id"
+          ],
+          "tableTo": "item",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "item_ad_images_ad_image_id_ad_image_id_fk": {
+          "name": "item_ad_images_ad_image_id_ad_image_id_fk",
+          "tableFrom": "item_ad_images",
+          "columnsFrom": [
+            "ad_image_id"
+          ],
+          "tableTo": "ad_image",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "item_ad_links": {
+      "name": "item_ad_links",
+      "columns": {
+        "item_id": {
+          "name": "item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ad_link_id": {
+          "name": "ad_link_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "item_ad_links_item_id_ad_link_id_unique": {
+          "name": "item_ad_links_item_id_ad_link_id_unique",
+          "columns": [
+            "item_id",
+            "ad_link_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "item_ad_links_item_id_item_id_fk": {
+          "name": "item_ad_links_item_id_item_id_fk",
+          "tableFrom": "item_ad_links",
+          "columnsFrom": [
+            "item_id"
+          ],
+          "tableTo": "item",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "item_ad_links_ad_link_id_ad_link_id_fk": {
+          "name": "item_ad_links_ad_link_id_ad_link_id_fk",
+          "tableFrom": "item_ad_links",
+          "columnsFrom": [
+            "ad_link_id"
+          ],
+          "tableTo": "ad_link",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "item_categories": {
+      "name": "item_categories",
+      "columns": {
+        "item_id": {
+          "name": "item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "item_categories_item_id_category_unique": {
+          "name": "item_categories_item_id_category_unique",
+          "columns": [
+            "item_id",
+            "category"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "item_categories_item_id_item_id_fk": {
+          "name": "item_categories_item_id_item_id_fk",
+          "tableFrom": "item_categories",
+          "columnsFrom": [
+            "item_id"
+          ],
+          "tableTo": "item",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "item_tag": {
+      "name": "item_tag",
+      "columns": {
+        "item_id": {
+          "name": "item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "item_tag_item_id_tag_id_unique": {
+          "name": "item_tag_item_id_tag_id_unique",
+          "columns": [
+            "item_id",
+            "tag_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "item_tag_item_id_item_id_fk": {
+          "name": "item_tag_item_id_item_id_fk",
+          "tableFrom": "item_tag",
+          "columnsFrom": [
+            "item_id"
+          ],
+          "tableTo": "item",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "item_tag_tag_id_tag_id_fk": {
+          "name": "item_tag_tag_id_tag_id_fk",
+          "tableFrom": "item_tag",
+          "columnsFrom": [
+            "tag_id"
+          ],
+          "tableTo": "tag",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "tag": {
+      "name": "tag",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

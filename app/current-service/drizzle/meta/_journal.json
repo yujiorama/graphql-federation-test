@@ -8,6 +8,13 @@
       "when": 1757837348558,
       "tag": "0000_dusty_thunderbolts",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1757837374314,
+      "tag": "0001_seed",
+      "breakpoints": true
     }
   ]
 }
