@@ -27,8 +27,8 @@ function buildItem(db: DatabaseConnection, row: any): Item {
     const tags = db
         .prepare(
             `SELECT t.id, t.name, t.value
-             FROM tags t
-             JOIN items_tags it ON it.tag_id = t.id
+             FROM tag t
+             JOIN item_tags it ON it.tag_id = t.id
              WHERE it.item_id = ?`
         )
         .all(row.id)
@@ -51,9 +51,9 @@ function createItemDataSource(db: DatabaseConnection): ItemDataSource {
             const rows = db
                 .prepare(
                     `SELECT DISTINCT i.id, i.name, i.value, i.price
-                     FROM items i
-                     JOIN items_tags it ON it.item_id = i.id
-                     JOIN tags t ON t.id = it.tag_id
+                     FROM item i
+                     JOIN item_tags it ON it.item_id = i.id
+                     JOIN tag t ON t.id = it.tag_id
                      WHERE t.name = ? AND t.value = ?`
                 )
                 .all(name, value);
@@ -63,7 +63,7 @@ function createItemDataSource(db: DatabaseConnection): ItemDataSource {
 
         getItem(itemId: string): Item | undefined {
             const row = db
-                .prepare(`SELECT id, name, value, price FROM items WHERE id = ?`)
+                .prepare(`SELECT id, name, value, price FROM item WHERE id = ?`)
                 .get(itemId);
             if (!row) return undefined;
             return buildItem(db, row);
@@ -71,7 +71,7 @@ function createItemDataSource(db: DatabaseConnection): ItemDataSource {
 
         getItems(): Item[] {
             const rows = db
-                .prepare(`SELECT id, name, value, price FROM items ORDER BY id`)
+                .prepare(`SELECT id, name, value, price FROM item ORDER BY id`)
                 .all();
             return rows.map((r: any) => buildItem(db, r));
         },
@@ -83,7 +83,7 @@ function createTagDataSource(db: DatabaseConnection): TagDataSource {
         createTag(name: string, value: string): Tag {
             const id = randomUUID();
             db
-                .prepare(`INSERT INTO tags (id, name, value) VALUES (?, ?, ?)`)
+                .prepare(`INSERT INTO tag (id, name, value) VALUES (?, ?, ?)`)
                 .run(id, name, value);
             return {
                 id,
@@ -95,7 +95,7 @@ function createTagDataSource(db: DatabaseConnection): TagDataSource {
 
         getTag(tagId: string): Tag | undefined {
             const row = db
-                .prepare(`SELECT id, name, value FROM tags WHERE id = ?`)
+                .prepare(`SELECT id, name, value FROM tag WHERE id = ?`)
                 .get(tagId);
             if (!row) return undefined;
             return rowToTag(row);
@@ -103,7 +103,7 @@ function createTagDataSource(db: DatabaseConnection): TagDataSource {
 
         getTags(): Tag[] {
             const rows = db
-                .prepare(`SELECT id, name, value FROM tags ORDER BY id`)
+                .prepare(`SELECT id, name, value FROM tag ORDER BY id`)
                 .all();
             return rows.map(rowToTag);
         },
