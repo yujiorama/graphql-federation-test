@@ -19,7 +19,7 @@ extend schema
     ]
 )
 type Query {
-    getItem(itemId: ID!): Item
+    getItem(itemId: ID!): Item @shareable
     getTag(tagId: ID!): Tag
     findItemsByTag(name: String, value: String): [Item!]!
     node(id: ID!, typename: String!): Node

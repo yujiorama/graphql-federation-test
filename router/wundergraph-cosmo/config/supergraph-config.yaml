@@ -4,7 +4,7 @@ subgraphs:
     routing_url: http://current-service:4001/graphql
     schema:
       file: ./graph/current-service.graphqls
-#  - name: new-service
-#    routing_url: http://new-service:4002/graphql
-#    schema:
-#      file: graph/new-service.graphqls
+  - name: new-service
+    routing_url: http://new-service:4002/graphql
+    schema:
+      file: ./graph/new-service.graphqls
