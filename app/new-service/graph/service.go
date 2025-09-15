@@ -1,29 +1,24 @@
 package graph
 
 import (
+	"context"
+
 	"yujiorama.github.io/graphql-federation-test/app/new-service/datasource"
+	"yujiorama.github.io/graphql-federation-test/app/new-service/datasource/dao"
 	"yujiorama.github.io/graphql-federation-test/app/new-service/graph/model"
 )
 
-func FindItemByID(id string) (*model.Item, error) {
-	db, err := datasource.NewDB()
+func FindItemByID(ctx context.Context, id string) (*model.Item, error) {
+	db := datasource.DBFromContext(ctx)
+	q := dao.Use(db)
+	row, err := q.Item.WithContext(ctx).Where(q.Item.ID.Eq(id)).First()
 	if err != nil {
 		return nil, err
 	}
 
-	var item datasource.Item
-	tx := db.First(&item, "id = ?", id)
-	if tx.Error != nil {
-		return nil, tx.Error
-	}
-
+	itemNumber := row.Price
 	return &model.Item{
-		ID:     item.ID,
-		Number: int32Ptr(&item.Price),
+		ID:     row.ID,
+		Number: &itemNumber,
 	}, nil
-}
-
-func int32Ptr(i *int) *int32 {
-	v := int32(*i)
-	return &v
 }

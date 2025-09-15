@@ -33,6 +33,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Entity() EntityResolver
+	Query() QueryResolver
 }
 
 type DirectiveRoot struct {
@@ -49,6 +50,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		GetItem            func(childComplexity int, itemID string) int
 		__resolve__service func(childComplexity int) int
 		__resolve_entities func(childComplexity int, representations []map[string]any) int
 	}
@@ -102,6 +104,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Item.Number(childComplexity), true
+
+	case "Query.getItem":
+		if e.complexity.Query.GetItem == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getItem_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetItem(childComplexity, args["itemId"].(string)), true
 
 	case "Query._service":
 		if e.complexity.Query.__resolve__service == nil {
@@ -218,9 +232,10 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../schema.graphqls", Input: `extend schema
+	{Name: "../schema.graphqls", Input: `# noinspection GraphQLTypeRedefinition
+extend schema
 @link(
-    url: "https://specs.apollo.dev/federation/v2.5"
+    url: "https://specs.apollo.dev/federation/v2.9"
     import: [
         "@authenticated"
         "@composeDirective"
@@ -237,6 +252,9 @@ var sources = []*ast.Source{
         "@tag"
     ]
 )
+type Query {
+    getItem(itemId: ID!) : Item @shareable
+}
 
 type Item @key(fields: "id") {
   id: ID!

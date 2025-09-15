@@ -13,7 +13,7 @@ import (
 
 // FindItemByID is the resolver for the findItemByID field.
 func (r *entityResolver) FindItemByID(ctx context.Context, id string) (*model.Item, error) {
-	return FindItemByID(id)
+	return FindItemByID(ctx, id)
 }
 
 // Entity returns graph.EntityResolver implementation.
