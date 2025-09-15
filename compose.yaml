@@ -8,7 +8,9 @@ services:
       - PORT=4001
       - ENDPOINT_PATH=/graphql
       - SCHEMA_PATH=/app/graph/schema.graphqls
-      - DATABASE_URL=":memory:"
+      - DATABASE_URL=/data/app.db
+    volumes:
+      - db-data:/data
 
   new-service:
     build:
@@ -19,3 +21,9 @@ services:
       - PORT=4002
       - ENDPOINT_PATH=/graphql
       - SCHEMA_PATH=/app/graph/schema.graphqls
+      - DATABASE_URL=/data/app.db
+    volumes:
+      - db-data:/data
+
+volumes:
+  db-data:
