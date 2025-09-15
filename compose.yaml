@@ -8,14 +8,24 @@ services:
       - PORT=4001
       - ENDPOINT_PATH=/graphql
       - SCHEMA_PATH=/app/graph/schema.graphqls
-      - DATABASE_URL=":memory:"
+      - DATABASE_URL=/data/app.db
+    volumes:
+      - db-data:/data
 
   new-service:
     build:
       context: app/new-service
+    depends_on:
+      - current-service
     ports:
       - "14002:4002"
     environment:
       - PORT=4002
       - ENDPOINT_PATH=/graphql
       - SCHEMA_PATH=/app/graph/schema.graphqls
+      - DATABASE_URL=/data/app.db
+    volumes:
+      - db-data:/data
+
+volumes:
+  db-data:

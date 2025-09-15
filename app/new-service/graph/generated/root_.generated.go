@@ -33,6 +33,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Entity() EntityResolver
+	Query() QueryResolver
 }
 
 type DirectiveRoot struct {
@@ -49,6 +50,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		GetItem            func(childComplexity int, itemID string) int
 		__resolve__service func(childComplexity int) int
 		__resolve_entities func(childComplexity int, representations []map[string]any) int
 	}
@@ -72,7 +74,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 	return parsedSchema
 }
 
-func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
+func (e *executableSchema) Complexity(ctx context.Context, typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
@@ -82,7 +84,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Entity_findItemByID_args(context.TODO(), rawArgs)
+		args, err := ec.field_Entity_findItemByID_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -103,6 +105,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.Number(childComplexity), true
 
+	case "Query.getItem":
+		if e.complexity.Query.GetItem == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getItem_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetItem(childComplexity, args["itemId"].(string)), true
+
 	case "Query._service":
 		if e.complexity.Query.__resolve__service == nil {
 			break
@@ -115,7 +129,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query__entities_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query__entities_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -218,13 +232,33 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../schema.graphqls", Input: `extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.5",
-        import: ["@key", "@shareable", "@provides", "@external"])
+	{Name: "../schema.graphqls", Input: `# noinspection GraphQLTypeRedefinition
+extend schema
+@link(
+    url: "https://specs.apollo.dev/federation/v2.9"
+    import: [
+        "@authenticated"
+        "@composeDirective"
+        "@external"
+        "@extends"
+        "@inaccessible"
+        "@interfaceObject"
+        "@override"
+        "@provides"
+        "@key"
+        "@requires"
+        "@requiresScopes"
+        "@shareable"
+        "@tag"
+    ]
+)
+type Query {
+    getItem(itemId: ID!) : Item @shareable
+}
 
 type Item @key(fields: "id") {
-  id: ID! @external
-  number: Int @shareable
+  id: ID!
+  number: Int
 }
 `, BuiltIn: false},
 	{Name: "../../federation/directives.graphql", Input: `
