@@ -1,4 +1,4 @@
-FROM node:20-slim AS wgc
+FROM node:22-slim AS wgc
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -26,7 +26,7 @@ RUN CURRENT_SERVICE_URL=${CURRENT_SERVICE_URL} \
 RUN jq -r .engineConfig.graphqlSchema /router/config/execution-config.json > /router/config/graph/supergraph.graphqls
 
 
-FROM ghcr.io/wundergraph/cosmo/router:0.189.0 as cosmo-router
+FROM ghcr.io/wundergraph/cosmo/router:latest as cosmo-router
 
 FROM gcr.io/distroless/base-debian12 AS router
 WORKDIR /router
@@ -34,6 +34,5 @@ COPY config/*.yaml /router/config/
 COPY config/*.json /router/config/
 COPY config/graph/*.graphqls /router/config/graph/
 COPY --from=builder /router/config/execution-config.json /router/config/execution-config.json
-COPY --from=builder /router/config/graph/supergraph.graphqls /router/config/graph/supergraph.graphqls
 COPY --from=cosmo-router /router /usr/local/bin/router
 CMD ["/usr/local/bin/router", "--config", "/router/config/router-config.yaml"]

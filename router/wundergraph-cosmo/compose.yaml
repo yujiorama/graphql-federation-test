@@ -22,7 +22,9 @@ services:
       - TRACING_OTLP_ENDPOINT=http://otelcollector:4317
       - CONTROLPLANE_URL=http://localhost:3001
       - EXECUTION_CONFIG_FILE=/router/config/execution-config.json
-      - CURRENT_SERVICE_URL=http://current-service:4001/graphql
+      - CONFIG_PATH=/router/config/router-config.yaml
+    volumes:
+      - ./router/wundergraph-cosmo/config/router-config.yaml:/router/config/router-config.yaml
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
