@@ -7,7 +7,7 @@ import {
     CreateTagPayloadResolvers,
     ItemResolvers,
     MutationResolvers,
-    NameValueResolvers,
+    NameValueResolvers, Node,
     NodeResolvers,
     QueryFindItemsByTagArgs,
     QueryGetItemArgs,
@@ -18,6 +18,7 @@ import {
     TagResolvers
 } from '../generated/resolvers-types';
 import {MyContext} from "../index";
+import {GraphQLResolveInfo} from "graphql";
 
 const adResolvers: AdResolvers = {
     __resolveType(obj) {
@@ -28,11 +29,13 @@ const adResolvers: AdResolvers = {
 };
 
 const adImageResolvers: AdImageResolvers = {
+    id: (parent) => parent.id,
     text: (parent) => parent.text,
     url: (parent) => parent.url
 };
 
 const adLinkResolvers: AdLinkResolvers = {
+    id: (parent) => parent.id,
     text: (parent) => parent.text,
     url: (parent) => parent.url
 };
@@ -64,11 +67,11 @@ const itemResolvers: ItemResolvers = {
 
 const mutationResolvers: MutationResolvers = {
     addItem: async (_, {input}, {dataSource}) => {
-        const item = dataSource.item.getItem("temp");
+        const item = dataSource.item.createItem(input.name, input.price);
         return {ok: true, item};
     },
     addTagToItem: async (_, {input}, {dataSource}) => {
-        const item = dataSource.item.getItem(input.itemId);
+        const item = dataSource.item.addTag(input.itemId, input.tagId);
         return {ok: true, item};
     },
     createTag: async (_, {input}, {dataSource}) => {
@@ -81,19 +84,21 @@ const nameValueResolvers: NameValueResolvers = {
     name: (parent) => parent.name,
     value: (parent) => parent.value,
     __resolveType(obj) {
-        if ('price' in obj) return 'Item';
-        if ('value' in obj) return 'Tag';
+        if (obj.id.startsWith('item:')) return 'Item';
+        if (obj.id.startsWith('tag:')) return 'Tag';
         return null;
     }
 };
 
 const nodeResolvers: NodeResolvers = {
     id: (parent) => parent.id,
-    __resolveType(obj) {
-        if ('price' in obj) return 'Item';
-        if ('value' in obj) return 'Tag';
+    __resolveType(obj, context, info: GraphQLResolveInfo) {
+        if (obj.id.startsWith('item:')) return 'Item';
+        if (obj.id.startsWith('tag:')) return 'Tag';
+        if (obj.id.startsWith('ad_link:')) return 'AdLink';
+        if (obj.id.startsWith('ad_image:')) return 'AdImage';
         return null;
-    }
+    },
 };
 
 const queryResolvers: QueryResolvers = {
