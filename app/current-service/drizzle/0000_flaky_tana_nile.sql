@@ -40,14 +40,14 @@ CREATE TABLE `item_categories` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `item_categories_item_id_category_unique` ON `item_categories` (`item_id`,`category`);--> statement-breakpoint
-CREATE TABLE `item_tag` (
+CREATE TABLE `item_tags` (
 	`item_id` text NOT NULL,
 	`tag_id` text NOT NULL,
 	FOREIGN KEY (`item_id`) REFERENCES `item`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`tag_id`) REFERENCES `tag`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `item_tag_item_id_tag_id_unique` ON `item_tag` (`item_id`,`tag_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `item_tags_item_id_tag_id_unique` ON `item_tags` (`item_id`,`tag_id`);--> statement-breakpoint
 CREATE TABLE `tag` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,

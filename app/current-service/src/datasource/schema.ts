@@ -38,7 +38,7 @@ export const tag = sqliteTable("tag", {
  * Item.tag を表現
  */
 export const itemTags = sqliteTable(
-    "item_tag",
+    "item_tags",
     {
         itemId: text("item_id").notNull().references(() => item.id),
         tagId: text("tag_id").notNull().references(() => tag.id),

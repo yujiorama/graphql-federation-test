@@ -1,6 +1,6 @@
 {
-  "id": "1019b59f-8429-46d1-bf50-df22b4737a01",
-  "prevId": "5d3db55d-1f79-4ca1-95c1-caf1fc3b76dd",
+  "id": "7fa0f7e1-bacb-49b8-baa6-703b1614c00b",
+  "prevId": "ce0a1afc-f5e0-452b-9d11-c762ecd6a8d7",
   "version": "6",
   "dialect": "sqlite",
   "tables": {
@@ -271,8 +271,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "item_tag": {
-      "name": "item_tag",
+    "item_tags": {
+      "name": "item_tags",
       "columns": {
         "item_id": {
           "name": "item_id",
@@ -290,8 +290,8 @@
         }
       },
       "indexes": {
-        "item_tag_item_id_tag_id_unique": {
-          "name": "item_tag_item_id_tag_id_unique",
+        "item_tags_item_id_tag_id_unique": {
+          "name": "item_tags_item_id_tag_id_unique",
           "columns": [
             "item_id",
             "tag_id"
@@ -300,9 +300,9 @@
         }
       },
       "foreignKeys": {
-        "item_tag_item_id_item_id_fk": {
-          "name": "item_tag_item_id_item_id_fk",
-          "tableFrom": "item_tag",
+        "item_tags_item_id_item_id_fk": {
+          "name": "item_tags_item_id_item_id_fk",
+          "tableFrom": "item_tags",
           "columnsFrom": [
             "item_id"
           ],
@@ -313,9 +313,9 @@
           "onUpdate": "no action",
           "onDelete": "no action"
         },
-        "item_tag_tag_id_tag_id_fk": {
-          "name": "item_tag_tag_id_tag_id_fk",
-          "tableFrom": "item_tag",
+        "item_tags_tag_id_tag_id_fk": {
+          "name": "item_tags_tag_id_tag_id_fk",
+          "tableFrom": "item_tags",
           "columnsFrom": [
             "tag_id"
           ],

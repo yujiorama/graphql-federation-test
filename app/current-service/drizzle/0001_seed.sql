@@ -28,7 +28,7 @@ values
     ('item:3', 'Item 3', 'Value 3', 300);
 --> statement-breakpoint
 insert into
-    item_tag(item_id, tag_id)
+    item_tags(item_id, tag_id)
 values
     ('item:1', 'tag:1'),
     ('item:1', 'tag:2'),

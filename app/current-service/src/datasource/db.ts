@@ -1,8 +1,7 @@
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
 import Database from "better-sqlite3";
+import path from "node:path";
 
 export type DatabaseConnection = Database.Database;
 
@@ -19,14 +18,13 @@ let singleton: Database | null = null;
 export async function initDb(): Promise<Database> {
   if (singleton) return singleton;
 
-  const db = drizzle(process.env.DATABASE_URL);
+  const sqlite = new Database(process.env.DATABASE_URL)
+  const db = drizzle(sqlite, {});
 
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  const migrationsFolder = resolve(__dirname, "../../drizzle");
+const migrationsFolder = path.resolve(process.cwd(), "drizzle");
 
-  // プログラムからマイグレーションを適用（初回のみ）
-  migrate(db, { migrationsFolder });
+    // プログラムからマイグレーションを適用（初回のみ）
+  await migrate(db, { migrationsFolder });
 
   singleton = { db };
   return singleton;
