@@ -19,6 +19,6 @@ extend schema
 )
 
 type Item @key(fields: "id") {
-  id: ID! @external
-  number: Int @shareable
+  id: ID!
+  number: Int
 }

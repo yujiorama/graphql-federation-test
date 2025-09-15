@@ -72,7 +72,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 	return parsedSchema
 }
 
-func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
+func (e *executableSchema) Complexity(ctx context.Context, typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
@@ -82,7 +82,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Entity_findItemByID_args(context.TODO(), rawArgs)
+		args, err := ec.field_Entity_findItemByID_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -115,7 +115,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query__entities_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query__entities_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -219,12 +219,28 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "../schema.graphqls", Input: `extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.5",
-        import: ["@key", "@shareable", "@provides", "@external"])
+@link(
+    url: "https://specs.apollo.dev/federation/v2.5"
+    import: [
+        "@authenticated"
+        "@composeDirective"
+        "@external"
+        "@extends"
+        "@inaccessible"
+        "@interfaceObject"
+        "@override"
+        "@provides"
+        "@key"
+        "@requires"
+        "@requiresScopes"
+        "@shareable"
+        "@tag"
+    ]
+)
 
 type Item @key(fields: "id") {
-  id: ID! @external
-  number: Int @shareable
+  id: ID!
+  number: Int
 }
 `, BuiltIn: false},
 	{Name: "../../federation/directives.graphql", Input: `
