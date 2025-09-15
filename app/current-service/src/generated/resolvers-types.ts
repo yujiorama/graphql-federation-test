@@ -20,14 +20,16 @@ export type Scalars = {
 
 export type Ad = AdImage | AdLink;
 
-export type AdImage = {
+export type AdImage = Node & {
   readonly __typename?: 'AdImage';
+  readonly id: Scalars['ID']['output'];
   readonly text: Maybe<Scalars['String']['output']>;
   readonly url: Scalars['String']['output'];
 };
 
-export type AdLink = {
+export type AdLink = Node & {
   readonly __typename?: 'AdLink';
+  readonly id: Scalars['ID']['output'];
   readonly text: Scalars['String']['output'];
   readonly url: Scalars['String']['output'];
 };
@@ -227,7 +229,7 @@ export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = Reso
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = ResolversObject<{
   NameValue: ( Omit<Item, 'ads' | 'tags'> & { ads: ReadonlyArray<_RefType['Ad']>, tags: ReadonlyArray<_RefType['Tag']> } ) | ( Omit<Tag, 'items'> & { items: ReadonlyArray<_RefType['Item']> } );
-  Node: ( Omit<Item, 'ads' | 'tags'> & { ads: ReadonlyArray<_RefType['Ad']>, tags: ReadonlyArray<_RefType['Tag']> } ) | ( Omit<Tag, 'items'> & { items: ReadonlyArray<_RefType['Item']> } );
+  Node: ( AdImage ) | ( AdLink ) | ( Omit<Item, 'ads' | 'tags'> & { ads: ReadonlyArray<_RefType['Ad']>, tags: ReadonlyArray<_RefType['Tag']> } ) | ( Omit<Tag, 'items'> & { items: ReadonlyArray<_RefType['Item']> } );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -282,12 +284,14 @@ export type AdResolvers<ContextType = MyContext, ParentType extends ResolversPar
 }>;
 
 export type AdImageResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['AdImage'] = ResolversParentTypes['AdImage']> = ResolversObject<{
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   text: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   url: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type AdLinkResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['AdLink'] = ResolversParentTypes['AdLink']> = ResolversObject<{
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   text: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -335,7 +339,7 @@ export type NameValueResolvers<ContextType = MyContext, ParentType extends Resol
 }>;
 
 export type NodeResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'Item' | 'Tag', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AdImage' | 'AdLink' | 'Item' | 'Tag', ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
 }>;
 

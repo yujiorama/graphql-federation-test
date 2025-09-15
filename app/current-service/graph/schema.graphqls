@@ -20,12 +20,14 @@ interface NameValue {
     value: String!
 }
 
-type AdLink {
+type AdLink implements Node {
+    id: ID!
     text: String!
     url: String!
 }
 
-type AdImage {
+type AdImage implements Node {
+    id: ID!
     text: String
     url: String!
 }

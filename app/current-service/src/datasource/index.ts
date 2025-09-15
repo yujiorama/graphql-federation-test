@@ -1,11 +1,12 @@
-import { Item, Tag } from "../generated/resolvers-types";
-import { randomUUID } from "node:crypto";
+import {Item, Tag} from "../generated/resolvers-types";
 import type {Database, DatabaseConnection} from './db';
 
 export interface ItemDataSource {
     findItemsByTag: (name: string, value: string) => Promise<Item[]>;
     getItem: (itemId: string) => Item | undefined;
     getItems: () => Item[];
+    createItem: (name: string, price: number) => Item;
+    addTag: (itemId: string, tagId: string) => Item;
 }
 
 export interface TagDataSource {
@@ -26,10 +27,16 @@ function rowToTag(row: any): Tag {
 function buildItem(db: DatabaseConnection, row: any): Item {
     const tags = db
         .prepare(
-            `SELECT t.id, t.name, t.value
-             FROM tag t
-             JOIN item_tags it ON it.tag_id = t.id
-             WHERE it.item_id = ?`
+            `SELECT
+                 t.id,
+                 t.name,
+                 t.value
+             FROM
+                 tag t
+                 JOIN item_tags it
+                      ON it.tag_id = t.id
+             WHERE
+                 it.item_id = ?`
         )
         .all(row.id)
         .map(rowToTag);
@@ -50,11 +57,20 @@ function createItemDataSource(db: DatabaseConnection): ItemDataSource {
         async findItemsByTag(name: string, value: string): Promise<Item[]> {
             const rows = db
                 .prepare(
-                    `SELECT DISTINCT i.id, i.name, i.value, i.price
-                     FROM item i
-                     JOIN item_tags it ON it.item_id = i.id
-                     JOIN tag t ON t.id = it.tag_id
-                     WHERE t.name = ? AND t.value = ?`
+                    `SELECT DISTINCT
+                         i.id,
+                         i.name,
+                         i.value,
+                         i.price
+                     FROM
+                         item i
+                         JOIN item_tags it
+                              ON it.item_id = i.id
+                         JOIN tag t
+                              ON t.id = it.tag_id
+                     WHERE
+                         t.name = ?
+                       AND t.value = ?`
                 )
                 .all(name, value);
 
@@ -63,7 +79,15 @@ function createItemDataSource(db: DatabaseConnection): ItemDataSource {
 
         getItem(itemId: string): Item | undefined {
             const row = db
-                .prepare(`SELECT id, name, value, price FROM item WHERE id = ?`)
+                .prepare(`SELECT
+                              id,
+                              name,
+                              value,
+                              price
+                          FROM
+                              item
+                          WHERE
+                              id = ?`)
                 .get(itemId);
             if (!row) return undefined;
             return buildItem(db, row);
@@ -71,31 +95,105 @@ function createItemDataSource(db: DatabaseConnection): ItemDataSource {
 
         getItems(): Item[] {
             const rows = db
-                .prepare(`SELECT id, name, value, price FROM item ORDER BY id`)
+                .prepare(`SELECT
+                              id,
+                              name,
+                              value,
+                              price
+                          FROM
+                              item
+                          ORDER BY
+                              id`)
                 .all();
             return rows.map((r: any) => buildItem(db, r));
         },
+
+        createItem(name: string, price: number): Item {
+            const items = this.getItems();
+            const maxId = items.length > 0 ? items[items.length - 1].id : 0;
+            const newItemId = `item:${maxId + 1}`;
+            const runResult = db
+                .prepare(`INSERT INTO
+                              item (id, name, value, price)
+                          VALUES
+                              (?, ?, ?, ?)`)
+                .run(newItemId, name, name, price);
+
+            if (runResult.changes === 0) {
+                throw new Error('Failed to create item');
+            }
+
+            return {
+                id: newItemId,
+                name: name,
+                value: name,
+                price: price,
+                tags: [],
+                ads: [],
+                categories: [],
+            };
+        },
+        addTag(itemId: string, tagId: string): Item {
+            const item_tag_relation = db
+                .prepare(`SELECT
+                              item_id,
+                              tag_id
+                          FROM
+                              item_tags
+                          WHERE
+                                item_id = ?
+                            AND tag_id = ?`)
+                .get(itemId, tagId);
+            if (item_tag_relation) {
+                return this.getItem(itemId)!;
+            }
+            const runResult = db
+                .prepare(`INSERT INTO
+                              item_tags (item_id, tag_id)
+                          VALUES
+                              (?, ?)`)
+                .run(itemId, tagId);
+            if (runResult.changes === 0) {
+                throw new Error('Failed to create item_tag');
+            }
+            return this.getItem(itemId)!;
+        }
     };
 }
 
 function createTagDataSource(db: DatabaseConnection): TagDataSource {
     return {
         createTag(name: string, value: string): Tag {
-            const id = randomUUID();
-            db
-                .prepare(`INSERT INTO tag (id, name, value) VALUES (?, ?, ?)`)
-                .run(id, name, value);
+            const tags = this.getTags();
+            const maxId = tags.length > 0 ? tags[tags.length - 1].id : 0;
+            const newTagId = `tag:${maxId + 1}`;
+            const runResult = db
+                .prepare(`INSERT INTO
+                              tag (id, name, value)
+                          VALUES
+                              (?, ?, ?)`)
+                .run(newTagId, name, value);
+            if (runResult.changes === 0) {
+                throw new Error('Failed to create tag');
+            }
             return {
-                id,
+                id: newTagId,
                 name,
                 value,
-                items: undefined // フィールドリゾルバで解決する
+                items: [],
             };
         },
 
         getTag(tagId: string): Tag | undefined {
             const row = db
-                .prepare(`SELECT id, name, value FROM tag WHERE id = ?`)
+                .prepare(`SELECT
+                              id,
+                              name,
+                              value
+                          FROM
+                              tag
+                          WHERE
+                              id = ?`)
                 .get(tagId);
             if (!row) return undefined;
             return rowToTag(row);
@@ -103,7 +201,14 @@ function createTagDataSource(db: DatabaseConnection): TagDataSource {
 
         getTags(): Tag[] {
             const rows = db
-                .prepare(`SELECT id, name, value FROM tag ORDER BY id`)
+                .prepare(`SELECT
+                              id,
+                              name,
+                              value
+                          FROM
+                              tag
+                          ORDER BY
+                              id`)
                 .all();
             return rows.map(rowToTag);
         },
