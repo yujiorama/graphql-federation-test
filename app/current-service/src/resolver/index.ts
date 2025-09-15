@@ -14,9 +14,10 @@ import {
     QueryGetTagArgs,
     QueryNodeArgs,
     QueryResolvers,
-    Resolvers,
+    Resolvers, Tag,
     TagResolvers
 } from '../generated/resolvers-types';
+import {MyContext} from "../index";
 
 const adResolvers: AdResolvers = {
     __resolveType(obj) {
@@ -131,7 +132,9 @@ const tagResolvers: TagResolvers = {
     id: (parent) => parent.id,
     name: (parent) => parent.name,
     value: (parent) => parent.value,
-    item: (parent) => parent.item
+    items: async (parent: Tag, args: unknown, ctx: MyContext, info: unknown) => {
+        return ctx.dataSource.item.findItemsByTag(parent.name, parent.value);
+    }
 };
 
 export function newMyResolvers(): Resolvers {

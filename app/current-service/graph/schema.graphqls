@@ -52,7 +52,7 @@ type Tag implements Node & NameValue {
     id: ID!
     name: String!
     value: String!
-    item: Item
+    items: [Item!]!
 }
 
 input AddItemInput {

@@ -19,7 +19,7 @@ function rowToTag(row: any): Tag {
         id: String(row.id),
         name: String(row.name),
         value: String(row.value),
-        item: undefined, // 必要なら関連取得で埋める
+        items: undefined // フィールドリゾルバで解決する,
     };
 }
 
@@ -89,7 +89,7 @@ function createTagDataSource(db: DatabaseConnection): TagDataSource {
                 id,
                 name,
                 value,
-                item: undefined,
+                items: undefined // フィールドリゾルバで解決する
             };
         },
 

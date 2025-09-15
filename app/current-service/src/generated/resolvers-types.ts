@@ -146,7 +146,7 @@ export type QueryNodeArgs = {
 export type Tag = NameValue & Node & {
   readonly __typename?: 'Tag';
   readonly id: Scalars['ID']['output'];
-  readonly item: Maybe<Item>;
+  readonly items: ReadonlyArray<Item>;
   readonly name: Scalars['String']['output'];
   readonly value: Scalars['String']['output'];
 };
@@ -226,8 +226,8 @@ export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = Reso
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = ResolversObject<{
-  NameValue: ( Omit<Item, 'ads' | 'tags'> & { ads: ReadonlyArray<_RefType['Ad']>, tags: ReadonlyArray<_RefType['Tag']> } ) | ( Omit<Tag, 'item'> & { item: Maybe<_RefType['Item']> } );
-  Node: ( Omit<Item, 'ads' | 'tags'> & { ads: ReadonlyArray<_RefType['Ad']>, tags: ReadonlyArray<_RefType['Tag']> } ) | ( Omit<Tag, 'item'> & { item: Maybe<_RefType['Item']> } );
+  NameValue: ( Omit<Item, 'ads' | 'tags'> & { ads: ReadonlyArray<_RefType['Ad']>, tags: ReadonlyArray<_RefType['Tag']> } ) | ( Omit<Tag, 'items'> & { items: ReadonlyArray<_RefType['Item']> } );
+  Node: ( Omit<Item, 'ads' | 'tags'> & { ads: ReadonlyArray<_RefType['Ad']>, tags: ReadonlyArray<_RefType['Tag']> } ) | ( Omit<Tag, 'items'> & { items: ReadonlyArray<_RefType['Item']> } );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -251,7 +251,7 @@ export type ResolversTypes = ResolversObject<{
   Node: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Node']>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
-  Tag: ResolverTypeWrapper<Omit<Tag, 'item'> & { item: Maybe<ResolversTypes['Item']> }>;
+  Tag: ResolverTypeWrapper<Omit<Tag, 'items'> & { items: ReadonlyArray<ResolversTypes['Item']> }>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -274,7 +274,7 @@ export type ResolversParentTypes = ResolversObject<{
   Node: ResolversInterfaceTypes<ResolversParentTypes>['Node'];
   Query: {};
   String: Scalars['String']['output'];
-  Tag: Omit<Tag, 'item'> & { item: Maybe<ResolversParentTypes['Item']> };
+  Tag: Omit<Tag, 'items'> & { items: ReadonlyArray<ResolversParentTypes['Item']> };
 }>;
 
 export type AdResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Ad'] = ResolversParentTypes['Ad']> = ResolversObject<{
@@ -348,7 +348,7 @@ export type QueryResolvers<ContextType = MyContext, ParentType extends Resolvers
 
 export type TagResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Tag'] = ResolversParentTypes['Tag']> = ResolversObject<{
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  item: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType>;
+  items: Resolver<ReadonlyArray<ResolversTypes['Item']>, ParentType, ContextType>;
   name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   value: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
