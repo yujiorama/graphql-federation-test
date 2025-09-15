@@ -4,11 +4,14 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p .",
+    "build:watch": "tsc -w -p .",
     "start": "dotenvx run --env-file=.env node dist/index.js",
     "prestart": "pnpm codegen:generate && pnpm build",
-    "dev": "dotenvx run --env-file=.env.dev --env-file=.env node dist/index.js",
-    "predev": "pnpm codegen:generate && pnpm build",
-    "codegen:generate": "graphql-codegen"
+    "serve:watch": "dotenvx run --env-file=.env.dev --env-file=.env -- nodemon --watch dist --watch graph --ext js,graphql,json --exec \"node dist/index.js\"",
+    "codegen:generate": "graphql-codegen",
+    "codegen:watch": "graphql-codegen --watch",
+    "dev": "concurrently -k \"pnpm run codegen:watch\" \"pnpm run build:watch\" \"pnpm run serve:watch\"",
+    "predev": "pnpm codegen:generate && pnpm build"
   },
   "keywords": [],
   "author": "",
@@ -27,9 +30,12 @@
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/typescript": "4.1.5",
     "@graphql-codegen/typescript-resolvers": "4.4.4",
+    "@parcel/watcher": "^2.5.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.18.3",
+    "concurrently": "^9.0.1",
     "drizzle-kit": "^0.31.4",
+    "nodemon": "^3.1.0",
     "typescript": "^5.9.2"
   }
 }
