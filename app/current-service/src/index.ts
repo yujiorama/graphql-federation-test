@@ -1,60 +1,42 @@
-import {readFileSync} from "fs";
-import {resolve} from "path";
+import '@dotenvx/dotenvx/config';
 import {ApolloServer} from "@apollo/server";
 import {startStandaloneServer} from "@apollo/server/standalone";
 import {ApolloServerPluginInlineTraceDisabled} from '@apollo/server/plugin/disabled';
 import gql from "graphql-tag";
-import resolvers from "./resolvers/index.js";
-import {ItemDatasource, TagDatasource} from "./datasource.js";
+import {newMyResolvers} from "./resolver/index.js";
+import {MyDataSource, newMyDataSource} from "./datasource/index.js";
+import { initDb } from "./datasource/db.js";
+import {fileURLToPath} from "node:url";
+import * as path from "path";
+import * as fs from "fs";
+import {ApolloLoggerPlugin} from "apollo-server-logging";
 
 // スキーマをファイルから読み込む
-const schemaPath = resolve(process.env.SCHEMA_PATH || "../graph/schema.graphqls");
-const typeDefs = readFileSync(schemaPath, "utf-8");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const schemaPath = process.env.SCHEMA_PATH ?? path.resolve(__dirname, "../graph/schema.graphqls");
+const typeDefs = fs.readFileSync(schemaPath, "utf-8");
+
+// DB 初期化（マイグレーション & シード適用）
+const database = await initDb();
 
 export interface MyContext {
-    dataSources: {
-        itemDataSource: ItemDatasource;
-        tagDataSource: TagDatasource;
-    }
+    dataSource: MyDataSource;
 }
-
-// アクセスログを出力するためのプラグイン
-const logAccessPlugin = {
-    async requestDidStart(requestContext: any) {
-        const {request} = requestContext;
-        const startTime = new Date();
-        console.log(`[${startTime.toISOString()}] Incoming request:`);
-        console.log(`  Query: ${request.query}`);
-        console.log(`  Variables: ${JSON.stringify(request.variables)}`);
-        console.log(`  Headers: ${JSON.stringify(request.http?.headers)}`);
-
-        return {
-            async willSendResponse(responseContext: any) {
-                const endTime = new Date();
-                const duration = endTime.getTime() - startTime.getTime();
-                console.log(`[${endTime.toISOString()}] Request processed in ${duration}ms`);
-                console.log(`  Response: ${JSON.stringify(responseContext.response)}`);
-            },
-        };
-    },
-};
 
 const server = new ApolloServer<MyContext>({
     typeDefs: gql(typeDefs),
-    resolvers: resolvers,
-    plugins: [ApolloServerPluginInlineTraceDisabled(), logAccessPlugin],
+    resolvers: newMyResolvers(),
+    plugins: [ApolloServerPluginInlineTraceDisabled(), ApolloLoggerPlugin({})],
 });
 
 const endpointPath = process.env.ENDPOINT_PATH || "/graphql";
 const endpointPort = process.env.PORT || "4001";
 
 const serverOptions = {
-    context: async ({req}) => {
+    context: async () => {
         return {
-            dataSources: {
-                itemDataSource: new ItemDatasource(),
-                tagDataSource: new TagDatasource(),
-            }
+            dataSource: newMyDataSource(database),
         };
     },
     listen: {

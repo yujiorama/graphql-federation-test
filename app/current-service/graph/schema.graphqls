@@ -1,28 +1,58 @@
-# noinspection GraphQLTypeRedefinition
-type Item {
-    id: ID!
-    name: String!
-    price: Int
-    tags: [Tag!]!
-}
-
-type Tag {
-    id: ID!
-    name: String!
-    value: String!
-    item: Item
-}
-
 type Query {
-    getItem(id: ID!): Item
-    getTag(id: ID!): Tag
+    getItem(itemId: ID!): Item
+    getTag(tagId: ID!): Tag
     findItemsByTag(name: String, value: String): [Item!]!
+    node(id: ID!, typename: String!): Node
 }
 
 type Mutation {
     addItem(input: AddItemInput!): AddItemPayload!
     addTagToItem(input: AddTagToItemInput!): AddTagToItemPayload!
     createTag(input: CreateTagInput!): CreateTagPayload!
+}
+
+interface Node {
+    id: ID!
+}
+
+interface NameValue {
+    name: String!
+    value: String!
+}
+
+type AdLink {
+    text: String!
+    url: String!
+}
+
+type AdImage {
+    text: String
+    url: String!
+}
+
+union Ad = AdLink | AdImage
+
+enum Category {
+    SHOES
+    CLOTHES
+    ACCESSORIES
+}
+
+type Item implements Node & NameValue {
+    id: ID!
+    name: String!
+    value: String!
+    price: Int
+    tags: [Tag!]!
+    ads: [Ad!]!
+    categories: [Category!]!
+}
+
+type Tag implements Node & NameValue {
+    id: ID!
+    name: String!
+    value: String!
+    items: [Item!]!
 }
 
 input AddItemInput {

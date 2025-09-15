@@ -4,24 +4,38 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p .",
-    "start": "node dist/index.js",
-    "start:dev": "pnpm build && pnpm start",
-    "codegen": "graphql-codegen --config codegen.yaml"
+    "build:watch": "tsc -w -p .",
+    "start": "dotenvx run --env-file=.env node dist/index.js",
+    "prestart": "pnpm codegen:generate && pnpm build",
+    "serve:watch": "dotenvx run --env-file=.env.dev --env-file=.env -- nodemon --watch dist --watch graph --ext js,graphql,json --exec \"node dist/index.js\"",
+    "codegen:generate": "graphql-codegen",
+    "codegen:watch": "graphql-codegen --watch",
+    "dev": "concurrently -k \"pnpm run codegen:watch\" \"pnpm run build:watch\" \"pnpm run serve:watch\"",
+    "predev": "pnpm codegen:generate && pnpm build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@apollo/server": "^4.11.3",
-    "graphql": "^16.10.0",
+    "@apollo/server": "5.0.0",
+    "@dotenvx/dotenvx": "^1.49.0",
+    "apollo-server-logging": "^1.0.2",
+    "better-sqlite3": "^9.4.3",
+    "drizzle-orm": "^0.44.5",
+    "graphql": "^16.11.0",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/typescript": "4.1.5",
     "@graphql-codegen/typescript-resolvers": "4.4.4",
-    "@types/node": "^22.13.9",
-    "typescript": "^5.8.2"
+    "@parcel/watcher": "^2.5.1",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.18.3",
+    "concurrently": "^9.0.1",
+    "drizzle-kit": "^0.31.4",
+    "nodemon": "^3.1.0",
+    "typescript": "^5.9.2"
   }
 }
