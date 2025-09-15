@@ -9,6 +9,7 @@ import { initDb } from "./datasource/db.js";
 import {fileURLToPath} from "node:url";
 import * as path from "path";
 import * as fs from "fs";
+import {ApolloLoggerPlugin} from "apollo-server-logging";
 
 // スキーマをファイルから読み込む
 const __filename = fileURLToPath(import.meta.url);
@@ -23,31 +24,10 @@ export interface MyContext {
     dataSource: MyDataSource;
 }
 
-// アクセスログを出力するためのプラグイン
-const logAccessPlugin = {
-    async requestDidStart(requestContext: any) {
-        const {request} = requestContext;
-        const startTime = new Date();
-        console.log(`[${startTime.toISOString()}] Incoming request:`);
-        console.log(`  Query: ${request.query}`);
-        console.log(`  Variables: ${JSON.stringify(request.variables)}`);
-        console.log(`  Headers: ${JSON.stringify(request.http?.headers)}`);
-
-        return {
-            async willSendResponse(responseContext: any) {
-                const endTime = new Date();
-                const duration = endTime.getTime() - startTime.getTime();
-                console.log(`[${endTime.toISOString()}] Request processed in ${duration}ms`);
-                console.log(`  Response: ${JSON.stringify(responseContext.response)}`);
-            },
-        };
-    },
-};
-
 const server = new ApolloServer<MyContext>({
     typeDefs: gql(typeDefs),
     resolvers: newMyResolvers(),
-    plugins: [ApolloServerPluginInlineTraceDisabled(), logAccessPlugin],
+    plugins: [ApolloServerPluginInlineTraceDisabled(), ApolloLoggerPlugin({})],
 });
 
 const endpointPath = process.env.ENDPOINT_PATH || "/graphql";
