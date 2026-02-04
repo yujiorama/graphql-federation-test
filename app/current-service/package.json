@@ -18,7 +18,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@apollo/server": "5.0.0",
+    "@apollo/server": "5.4.0",
     "@dotenvx/dotenvx": "^1.49.0",
     "apollo-server-logging": "^1.0.2",
     "better-sqlite3": "^9.4.3",
